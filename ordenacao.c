@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void bubble_sort(int vet[], int n){
+void bubble_sort(int *vet, int n){
     int troca = 1; 
     for (int i = 0; i < n; i++){
         int troca = 0; 
@@ -19,7 +19,7 @@ void bubble_sort(int vet[], int n){
     }
 }
 
-void selection_sort(int vet[], int n){
+void selection_sort(int *vet, int n){
     for (int i = 0; i < n-1; i++){
         int min = i; 
         for (int j = i + 1; j < n; j++){
@@ -34,7 +34,7 @@ void selection_sort(int vet[], int n){
     }
 }
 
-void insertion_sort(int vet[], int n){
+void insertion_sort(int *vet, int n){
     int j; 
     for (int i = 1; i < n; i++){
         int x = vet[i]; 
@@ -45,7 +45,7 @@ void insertion_sort(int vet[], int n){
     }
 }
 
-void shell_sort(int vet[], int inc[], int n, int n_inc){
+void shell_sort(int *vet, int inc[], int n, int n_inc){
     int i, j; 
     int h; 
     for (int incre = 0; incre < n_inc; incre++){ //vai iterar pelos elementos de inc
@@ -62,7 +62,7 @@ void shell_sort(int vet[], int inc[], int n, int n_inc){
 
 }
 
-void quick_sort(int vet[], int inicio, int fim){
+void quick_sort(int *vet, int inicio, int fim){
     int i = inicio; 
     int j = fim; 
     int pivo = mediana(vet[inicio], vet[(inicio+fim)/2], vet[fim], vet); 
@@ -84,7 +84,7 @@ void quick_sort(int vet[], int inicio, int fim){
 
 }
 
-int mediana(int a, int b, int c, int vet[]){
+int mediana(int a, int b, int c, int *vet){
     if((a >= b && a <= c)||(a <= b && a >= c))
         return a;
     else if((b>=a && b<=c)||(b<=a && b >= c))
@@ -117,7 +117,7 @@ void construir_heap(int heap, int tam_heap){
     }
 }
 
-void heap_sort(int vet[], int n){
+void heap_sort(int *vet, int n){
     construir_heap(vet, n);
     for (int i = n; i >= 0; i--){
         int aux = vet[0]; 
@@ -128,7 +128,7 @@ void heap_sort(int vet[], int n){
     }
 }
 
-void merge_sort(int vet[], int inicio, int fim){
+void merge_sort(int *vet, int inicio, int fim){
     if (inicio < fim){
         int meio = (inicio+fim)/2; 
         merge_sort(vet, inicio, meio);
@@ -137,7 +137,7 @@ void merge_sort(int vet[], int inicio, int fim){
     }
 }
 
-void intercala(int vet[], int inicio, int meio, int fim){
+void intercala(int *vet, int inicio, int meio, int fim){
     int i, j, k;
     int n1, n2;
     //Tamanho dos vetores 
@@ -168,7 +168,7 @@ void intercala(int vet[], int inicio, int meio, int fim){
     }
 }
 
-void contagem_de_menores(int vet[], int n){
+void contagem_de_menores(int *vet, int n){
     int *posicao = (int*)malloc(sizeof(int)*n); 
     //zerar o vetor posicao 
     for (int i = 0; i < n; i++){
@@ -196,14 +196,15 @@ void contagem_de_menores(int vet[], int n){
 }
 
 
-int *radixsort(int vet[], int tam, int n_dig){
+//acho bom a gente mudar o radix sort para ser void (não sei se dá)
+int *radixsort(int *vet, int tam, int n_dig){
     for(int i = n_dig; i > 0; i--){
         vet = counting_sort(vet, tam, i);
     }
     return counting_sort(vet, tam, 0);
 }
 
-int *counting_sort(int vet[], int tam, int pos){
+int *counting_sort(int *vet, int tam, int pos){
     int tipos[10] = {0};
     for(int i = 0; i < tam; i++){
         tipos[vet[pos]]++;
@@ -220,4 +221,33 @@ int *counting_sort(int vet[], int tam, int pos){
 
     free(vet);
     return sorted;
+}
+
+void imprimir_vetor(int *vet, int n){
+    for (int i = 0; i < n; i++){
+        printf("%d ", vet[i]); 
+    }
+    printf("\n"); 
+}
+
+int main(void){
+    int n; 
+
+    printf("Tamanho do vetor:\n"); 
+    scanf("%d", &n); 
+
+    int *vet = (int*) malloc(sizeof(int)*n); 
+    bubble_sort(vet, n);
+    selection_sort(vet, n);
+    insertion_sort(vet, n); 
+    shell_sort(vet, inc, n, n_inc); 
+    quick_sort(vet, 0, n-1); 
+    heap_sort(vet, n); 
+    merge_sort(vet, 0, n-1); 
+    contagem_de_menores(vet, n); 
+    radixsort(vet, n, n_dig); 
+
+    imprimir_vetor(vet, n); 
+    
+
 }
