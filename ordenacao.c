@@ -168,36 +168,56 @@ void intercala(int vet[], int inicio, int meio, int fim){
     }
 }
 
-//contagem dos menores 
+void contagem_de_menores(int vet[], int n){
+    int *posicao = (int*)malloc(sizeof(int)*n); 
+    //zerar o vetor posicao 
+    for (int i = 0; i < n; i++){
+        posicao[i] = 0; 
+    }
+    for (int i = 1; i < n; i++){
+        for (int j = i - 1; j >= 0; j--){
+            if (vet[i] < vet[j]){
+                posicao[j]++; 
 
-int radixsort(int vet[], int tam, int n_dig){
-    for (int i = 0; i < tam; i++){    
-        vet[i] = converte(vet[i], n_dig+4); 
+            }
+            else{
+                posicao[i]++;
+            }   
+        }
     }
-    for(int i=n_dig; i>0; i--){
-        vet=counting_sort(vet, tam, i);
-        printf("Após ordenar o %d° dígito dos valores:\n", i);
-        print_array(vet, tam);
+    int *sorted = (int*)malloc(sizeof(int)*n); 
+
+    for (int i = 0; i < n; i++){
+        sorted[posicao[i]] = vet[i]; 
     }
-    
+    for (int i = 0; i < n; i++){
+        vet[i] = sorted[i]; 
+    }
+}
+
+
+int *radixsort(int vet[], int tam, int n_dig){
+    for(int i = n_dig; i > 0; i--){
+        vet = counting_sort(vet, tam, i);
+    }
     return counting_sort(vet, tam, 0);
 }
 
-int counting_sort(int vet[], int tam, int pos){
-    int tipos[10]={0};
-    for(int i=0; i<tam; i++){
-        tipos[vet[][i][pos]]++;
+int *counting_sort(int vet[], int tam, int pos){
+    int tipos[10] = {0};
+    for(int i = 0; i < tam; i++){
+        tipos[vet[pos]]++;
     }
-    for(int i=1; i<10; i++)
-        tipos[i]+=tipos[i-1];
+    for(int i = 1; i < 10; i++)
+        tipos[i] += tipos[i-1];
 
-    int *sorted=malloc(tam*sizeof(Carta));
+    int* sorted = malloc(tam * sizeof(int));
 
-    for(int i=tam-1; i>=0; i--){
-        sorted[tipos[vet[][i].valor_converte[pos]]-1]=vet[][i];
-        tipos[vet[][i].valor_converte[pos]]--;
+    for(int i = tam-1; i >= 0; i--){
+        sorted[tipos[vet[pos]]-1] = vet[i];
+        tipos[vet[pos]]--;
     }
 
-    free(vet[]);
+    free(vet);
     return sorted;
 }
