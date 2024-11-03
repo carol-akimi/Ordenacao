@@ -25,9 +25,11 @@ void bubble_sort(int *vet, int n){
 }
 
 void selection_sort(int *vet, int n){
+    int comp = 0; int trocas = 0; 
     for (int i = 0; i < n-1; i++){
         int min = i; 
         for (int j = i + 1; j < n; j++){
+            comp++; 
             if (vet[j] < vet[min])
                 min = j; 
         }
@@ -35,58 +37,56 @@ void selection_sort(int *vet, int n){
             int aux = vet[i];
             vet[i] = vet[min];
             vet[min] = aux;
+            trocas++; 
         }
     }
+    printf("Quantidade de comparações: %d\n", comp); 
+    printf("Quantidade de movimentações: %d\n", trocas); 
 }
 
 void insertion_sort(int *vet, int n){
+    int comp = 0; int trocas = 0; 
     int j; 
     for (int i = 1; i < n; i++){
         int x = vet[i]; 
-        for (j = i - 1; j >= 0 && vet[j] > x; j--){
-            vet[j+1] = vet[j]; 
+        for (j = i - 1; j >= 0; j--){
+            comp++; 
+            if (vet[j] > x){
+                vet[j+1] = vet[j]; 
+                trocas++; 
+            }else{
+                break; 
+            }
         }
-        vet[j+1] = x; 
+        vet[j+1] = x;
     }
+    printf("Quantidade de comparações: %d\n", comp); 
+    printf("Quantidade de movimentações: %d\n", trocas); 
 }
 
 void shell_sort(int *vet, int inc[], int n, int n_inc){
+    int comp = 0; int trocas = 0; 
     int i, j; 
     int h; 
-    for (int incre = 0; incre < n_inc; incre++){ //vai iterar pelos elementos de inc
-        h = inc[incre]; 
+    for (int k = 0; k < n_inc; k++){ //vai iterar pelos elementos de inc
+        h = inc[k]; 
         //inserção simples 
         for (i = h; i < n; i++){
-            int aux = vet[i]; 
-            for (j = i - h; j >= 0 && vet[j] > aux; j -= h){
-                vet[j+h] = vet[j]; 
+            int x = vet[i]; 
+            for (j = i - h; j >= 0; j -= h){
+                comp++;
+                if (vet[j] > x){
+                    vet[j+h] = vet[j]; 
+                    trocas++; 
+                }else{
+                    break; 
+                }
             }
-            vet[j+h] = aux; 
+            vet[j+h] = x; 
         }
     }
-
-}
-
-void quick_sort(int *vet, int inicio, int fim){
-    int i = inicio; 
-    int j = fim; 
-    int pivo = mediana(vet[inicio], vet[(inicio+fim)/2], vet[fim], vet); 
-    do{
-        while (vet[i] < pivo) i++; 
-        while (vet[j] > pivo) j--;  
-        if (i <= j){
-            int aux = vet[i]; 
-            vet[i] = vet[j]; 
-            vet[j] = aux; 
-            i++; 
-            j--; 
-        }
-    }while (i < j); 
-    if (j > inicio)
-        quick_sort(vet, inicio, j); 
-    if (i < fim)
-        quick_sort(vet, i, fim);
-
+    printf("Quantidade de comparações: %d\n", comp); 
+    printf("Quantidade de movimentações: %d\n", trocas); 
 }
 
 int mediana(int a, int b, int c, int *vet){
@@ -96,6 +96,37 @@ int mediana(int a, int b, int c, int *vet){
         return b;
     else
         return c;
+}
+
+//a quantidade comp e trocas é printado na main 
+void quick_sort(int *vet, int inicio, int fim, int *comp, int *trocas){
+    int i = inicio; 
+    int j = fim; 
+    int pivo = mediana(vet[inicio], vet[(inicio+fim)/2], vet[fim], vet); 
+    do{
+        while (vet[i] < pivo){
+            i++; 
+            (*comp)++; 
+        }
+        (*comp)++; //quando a condição falha 
+        while (vet[j] > pivo){
+            j--; 
+            (*comp)++; 
+        }
+        (*comp)++; //quando a condição falha 
+        if (i <= j){ //conto essa comparação?
+            int aux = vet[i]; 
+            vet[i] = vet[j]; 
+            vet[j] = aux; 
+            i++; 
+            j--; 
+            (*trocas)++; 
+        }
+    }while (i < j); 
+        if (j > inicio)
+            quick_sort(vet, inicio, j, comp, trocas); 
+        if (i < fim)
+            quick_sort(vet, i, fim, comp, trocas);
 }
 
 void rearranjar_heap(int heap[], int tam_heap, int i){
@@ -245,12 +276,13 @@ int main(void){
     bubble_sort(vet, n);
     selection_sort(vet, n);
     insertion_sort(vet, n); 
-    shell_sort(vet, inc, n, n_inc); 
+    int inc[] = {5, 3, 1};
+    shell_sort(vet, inc, n, 3); 
     quick_sort(vet, 0, n-1); 
     heap_sort(vet, n); 
     merge_sort(vet, 0, n-1); 
     contagem_de_menores(vet, n); 
-    radixsort(vet, n, n_dig); 
+    radixsort(vet, n, n_dig); //rever isso 
 
     imprimir_vetor(vet, n); 
     

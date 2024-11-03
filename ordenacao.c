@@ -52,14 +52,23 @@ void shell_sort(int *vet, int inc[], int n, int n_inc){
         h = inc[incre]; 
         //inserção simples 
         for (i = h; i < n; i++){
-            int aux = vet[i]; 
-            for (j = i - h; j >= 0 && vet[j] > aux; j -= h){
+            int x = vet[i]; 
+            for (j = i - h; j >= 0 && vet[j] > x; j -= h){
                 vet[j+h] = vet[j]; 
             }
-            vet[j+h] = aux; 
+            vet[j+h] = x; 
         }
     }
 
+}
+
+int mediana(int a, int b, int c, int *vet){
+    if((a >= b && a <= c)||(a <= b && a >= c))
+        return a;
+    else if((b>=a && b<=c)||(b<=a && b >= c))
+        return b;
+    else
+        return c;
 }
 
 void quick_sort(int *vet, int inicio, int fim){
@@ -84,14 +93,6 @@ void quick_sort(int *vet, int inicio, int fim){
 
 }
 
-int mediana(int a, int b, int c, int *vet){
-    if((a >= b && a <= c)||(a <= b && a >= c))
-        return a;
-    else if((b>=a && b<=c)||(b<=a && b >= c))
-        return b;
-    else
-        return c;
-}
 
 void rearranjar_heap(int heap[], int tam_heap, int i){
     int esq, dir, maior; 
