@@ -129,7 +129,7 @@ void quick_sort(int *vet, int inicio, int fim, int *comp, int *trocas){
             quick_sort(vet, i, fim, comp, trocas);
 }
 
-void rearranjar_heap(int heap[], int tam_heap, int i){
+void rearranjar_heap(int *heap, int tam_heap, int i){
     int esq, dir, maior; 
     esq = 2*i + 1;
     dir = 2*1 + 2;
@@ -147,7 +147,7 @@ void rearranjar_heap(int heap[], int tam_heap, int i){
     }
 }
 
-void construir_heap(int heap, int tam_heap){
+void construir_heap(int *heap, int tam_heap){
     for (int i = (tam_heap/2) - 1; i >= 0; i--){
         rearranjar_heap(heap, tam_heap, i); 
     }
