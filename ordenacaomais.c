@@ -1,6 +1,8 @@
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#define QTD_TEST 28
 
 void bubble_sort(int *vet, int n){
     int comp = 0; int trocas = 0; 
@@ -266,25 +268,72 @@ void imprimir_vetor(int *vet, int n){
     printf("\n"); 
 }
 
-int main(void){
-    int n; 
+// int main(void){
+//     int n; 
 
-    printf("Tamanho do vetor:\n"); 
-    scanf("%d", &n); 
+//     printf("Tamanho do vetor:\n"); 
+//     scanf("%d", &n); 
 
-    int *vet = (int*) malloc(sizeof(int)*n); 
-    bubble_sort(vet, n);
-    selection_sort(vet, n);
-    insertion_sort(vet, n); 
-    int inc[] = {5, 3, 1};
-    shell_sort(vet, inc, n, 3); 
-    quick_sort(vet, 0, n-1); 
-    heap_sort(vet, n); 
-    merge_sort(vet, 0, n-1); 
-    contagem_de_menores(vet, n); 
-    radixsort(vet, n, n_dig); //rever isso 
+//     int *vet = (int*) malloc(sizeof(int)*n);
 
-    imprimir_vetor(vet, n); 
+//     clock_t ini, fim;
+//     ini=clock();
+//     bubble_sort(vet, n);
+//     selection_sort(vet, n);
+//     insertion_sort(vet, n); 
+//     int inc[] = {5, 3, 1};
+//     shell_sort(vet, inc, n, 3); 
+//     quick_sort(vet, 0, n-1); 
+//     heap_sort(vet, n); 
+//     merge_sort(vet, 0, n-1); 
+//     contagem_de_menores(vet, n); 
+//     radixsort(vet, n, n_dig); //rever isso
+//     fim=clock();
+
+//     imprimir_vetor(vet, n); 
     
+//     double tempo=(double)(fim-ini)/CLOCKS_PER_SEC;
+//     FILE* f=fopen("results.csv", "r+");
+//     fprintf(f, "%lf\n", tempo)
 
+// }
+
+int main(int argc, char* argv[]){
+    FILE* in = fopen(argv[1], "r");
+    FILE* out=fopen("results.csv", "r+");
+    for(int i=0; i<QTD_TEST; i++){
+        const char* filename;
+        fscanf(in, " %s", filename); //le qual vai ser o arquivo teste
+        FILE* input=fopen(filename, "r"); //abre o arquivo da vez
+        int n;
+        fscanf(input, "%d", &n);
+        int *vet = (int*) malloc(sizeof(int)*n);
+        for(int i=0; i<n; i++){
+            fscanf(input, "%d", &vet[i]);
+        }
+        fclose(input);
+        //imprimir_vetor(vet, n);
+        clock_t ini, fim;
+            ini=clock();
+        bubble_sort(vet, n);
+        // selection_sort(vet, n);
+        // insertion_sort(vet, n);
+        // int inc[] = {5, 3, 1};
+        // shell_sort(vet, inc, n, 3); 
+        // quick_sort(vet, 0, n-1); 
+        // heap_sort(vet, n); 
+        // merge_sort(vet, 0, n-1); 
+        // contagem_de_menores(vet, n); 
+        // radixsort(vet, n, n_dig); //rever isso
+            fim=clock();
+        free(vet);
+
+        double tempo=(double)(fim-ini)/CLOCKS_PER_SEC;
+        fprintf(out, "%lf, ", tempo)
+        printf("%d: BUBBLE SORT TOOK %lf s for %d elements\n", i, tempo, n);
+    }
+    fprintf(out, "\n");
+
+    fclose(in);
+    fclose(out);
 }
