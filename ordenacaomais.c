@@ -174,15 +174,6 @@ void heap_sort(int *vet, int n, int *comp, int *trocas){
     }
 }
 
-void merge_sort(int *vet, int inicio, int fim, int *comp, int *trocas){
-    if (inicio < fim){
-        int meio = (inicio+fim)/2; 
-        merge_sort(vet, inicio, meio, comp, trocas);
-        merge_sort(vet, meio+1, fim, comp, trocas); 
-        intercala(vet, inicio, meio, fim, comp, trocas); 
-    }
-}
-
 void intercala(int *vet, int inicio, int meio, int fim, int *comp, int *trocas){
     int i, j, k;
     int n1, n2;
@@ -214,6 +205,15 @@ void intercala(int *vet, int inicio, int meio, int fim, int *comp, int *trocas){
             j++; 
             (*trocas)++; 
         }
+    }
+}
+
+void merge_sort(int *vet, int inicio, int fim, int *comp, int *trocas){
+    if (inicio < fim){
+        int meio = (inicio+fim)/2; 
+        merge_sort(vet, inicio, meio, comp, trocas);
+        merge_sort(vet, meio+1, fim, comp, trocas); 
+        intercala(vet, inicio, meio, fim, comp, trocas); 
     }
 }
 
