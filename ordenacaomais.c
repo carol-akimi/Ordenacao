@@ -1,6 +1,7 @@
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 void bubble_sort(int *vet, int n){
     int comp = 0; int trocas = 0; 
@@ -129,51 +130,58 @@ void quick_sort(int *vet, int inicio, int fim, int *comp, int *trocas){
             quick_sort(vet, i, fim, comp, trocas);
 }
 
-void rearranjar_heap(int *heap, int tam_heap, int i){
-    int esq, dir, maior; 
+void rearranjar_heap(int *heap, int tam_heap, int i, int *comp, int *trocas){
+    int esq, dir, maior, aux; 
     esq = 2*i + 1;
-    dir = 2*1 + 2;
-    if (esq < tam_heap && heap[esq] > heap[maior]){
+    dir = 2*i + 2;
+    maior = i; 
+    (*comp)++; 
+    if ((esq < tam_heap) && (heap[esq] > heap[maior])){
         maior = esq; 
     }
-    if (dir < tam_heap && heap[dir] > heap[maior]){
+    (*comp)++; 
+    if ((dir < tam_heap) && (heap[dir] > heap[maior])){
         maior = dir; 
     }
     if(maior != i){
-        int aux = heap[maior];
+        aux = heap[maior];
         heap[maior] = heap[i];
         heap[i] = aux;
-        rearranjar_heap(heap, tam_heap, maior);
+        (*trocas)++; 
+        rearranjar_heap(heap, tam_heap, maior, comp, trocas);
     }
 }
 
-void construir_heap(int *heap, int tam_heap){
+//a quantidade comp e trocas é printado na main 
+void construir_heap(int *heap, int tam_heap, int *comp, int *trocas){
     for (int i = (tam_heap/2) - 1; i >= 0; i--){
-        rearranjar_heap(heap, tam_heap, i); 
+        rearranjar_heap(heap, tam_heap, i, comp, trocas); 
     }
 }
 
-void heap_sort(int *vet, int n){
-    construir_heap(vet, n);
-    for (int i = n; i >= 0; i--){
-        int aux = vet[0]; 
-        vet[0] = vet[i-1]; 
-        vet[i-1] = aux;
-        n--; 
-        rearranjar_heap(vet, n, 0);  
+void heap_sort(int *vet, int n, int *comp, int *trocas){
+    construir_heap(vet, n, comp, trocas); 
+    int tam_heap = n, aux; 
+    for (int i = n-1; i > 0; i--){
+        aux = vet[0]; 
+        vet[0] = vet[i]; 
+        vet[i] = aux; 
+        tam_heap--; 
+        (*trocas)++; 
+        rearranjar_heap(vet, tam_heap, 0, comp, trocas); 
     }
 }
 
-void merge_sort(int *vet, int inicio, int fim){
+void merge_sort(int *vet, int inicio, int fim, int *comp, int *trocas){
     if (inicio < fim){
         int meio = (inicio+fim)/2; 
-        merge_sort(vet, inicio, meio);
-        merge_sort(vet, meio+1, fim); 
-        intercala(vet, inicio, meio, fim); 
+        merge_sort(vet, inicio, meio, comp, trocas);
+        merge_sort(vet, meio+1, fim, comp, trocas); 
+        intercala(vet, inicio, meio, fim, comp, trocas); 
     }
 }
 
-void intercala(int *vet, int inicio, int meio, int fim){
+void intercala(int *vet, int inicio, int meio, int fim, int *comp, int *trocas){
     int i, j, k;
     int n1, n2;
     //Tamanho dos vetores 
@@ -184,27 +192,31 @@ void intercala(int *vet, int inicio, int meio, int fim){
 
     //Preenchimento dos vetores 
     for (i = 0; i < n1; i++){
-        L[i] = vet[inicio + 1]; 
+        L[i] = vet[inicio + i]; 
     }
-    L[n1] = 9999; //sentinela
+    L[n1] = INT_MAX; //sentinela
     for (j = 0; j < n2; j++){
         R[j] = vet[meio + j + 1]; 
     } 
-    R[n2] = 9999;  //sentinela2
+    R[n2] = INT_MAX;  //sentinela2
 
     i = 0; j = 0; 
-    for (k = 0; k < fim; k++){
+    for (k = inicio; k <= fim; k++){
+        (*comp)++; 
         if (L[i] <= R[j]){
             vet[k] = L[i]; 
             i++; 
+            (*trocas)++;  //receber é troca?
         }else{
             vet[k] = R[j]; 
             j++; 
+            (*trocas)++; 
         }
     }
 }
 
-void contagem_de_menores(int *vet, int n){
+int *contagem_de_menores(int *vet, int n){
+    int comp = 0, trocas = 0; 
     int *posicao = (int*)malloc(sizeof(int)*n); 
     //zerar o vetor posicao 
     for (int i = 0; i < n; i++){
@@ -212,9 +224,9 @@ void contagem_de_menores(int *vet, int n){
     }
     for (int i = 1; i < n; i++){
         for (int j = i - 1; j >= 0; j--){
+            comp++; 
             if (vet[i] < vet[j]){
                 posicao[j]++; 
-
             }
             else{
                 posicao[i]++;
@@ -222,28 +234,29 @@ void contagem_de_menores(int *vet, int n){
         }
     }
     int *sorted = (int*)malloc(sizeof(int)*n); 
-
     for (int i = 0; i < n; i++){
         sorted[posicao[i]] = vet[i]; 
-    }
-    for (int i = 0; i < n; i++){
-        vet[i] = sorted[i]; 
-    }
+    }    
+    printf("Quantidade de comparações: %d\n", comp); 
+    printf("Quantidade de movimentações: %d\n", trocas); 
+    return sorted; 
 }
 
 
-//acho bom a gente mudar o radix sort para ser void (não sei se dá)
 int *radixsort(int *vet, int tam, int n_dig){
-    for(int i = n_dig; i > 0; i--){
+    //int n_dig = numero_digitos(vet, tam); 
+    for(int i = 1; i <= n_dig; i++){
         vet = counting_sort(vet, tam, i);
     }
-    return counting_sort(vet, tam, 0);
+    printf("Quantidade de comparações: 0\n"); 
+    printf("Quantidade de movimentações: 0\n"); 
+    return vet; 
 }
 
 int *counting_sort(int *vet, int tam, int pos){
     int tipos[10] = {0};
     for(int i = 0; i < tam; i++){
-        tipos[vet[pos]]++;
+        tipos[digito(vet[i], pos)]++;
     }
     for(int i = 1; i < 10; i++)
         tipos[i] += tipos[i-1];
@@ -251,12 +264,19 @@ int *counting_sort(int *vet, int tam, int pos){
     int* sorted = malloc(tam * sizeof(int));
 
     for(int i = tam-1; i >= 0; i--){
-        sorted[tipos[vet[pos]]-1] = vet[i];
-        tipos[vet[pos]]--;
+        sorted[tipos[digito(vet[i], pos)]-1] = vet[i];
+        tipos[digito(vet[i], pos)]--;
     }
 
     free(vet);
     return sorted;
+}
+
+int digito(int num, int pos){
+    for(int i=0; i<(pos-1); i++)
+        num /= 10;
+
+    return num % 10;
 }
 
 void imprimir_vetor(int *vet, int n){
@@ -271,7 +291,7 @@ int main(void){
 
     printf("Tamanho do vetor:\n"); 
     scanf("%d", &n); 
-
+    
     int *vet = (int*) malloc(sizeof(int)*n); 
     bubble_sort(vet, n);
     selection_sort(vet, n);
@@ -282,7 +302,7 @@ int main(void){
     heap_sort(vet, n); 
     merge_sort(vet, 0, n-1); 
     contagem_de_menores(vet, n); 
-    radixsort(vet, n, n_dig); //rever isso 
+    radixsort(vet, n, 6); //rever isso 
 
     imprimir_vetor(vet, n); 
     
