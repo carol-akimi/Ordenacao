@@ -6,12 +6,12 @@
 #include <string.h>
 #include <time.h>
 #include <limits.h>
-#define QTD_TEST 28
+#define QTD_TESTS 28
 
-int comp, trocas;
+long long unsigned int comp, trocas;
 
 void bubble_sort(int *vet, int n){
-    int comp = 0; int trocas = 0; 
+    // int comp = 0; int trocas = 0; 
     for (int i = 0; i < n; i++){
         int troca = 0; 
         for (int j = 0; j < n - 1; j++){
@@ -33,7 +33,7 @@ void bubble_sort(int *vet, int n){
 }
 
 void selection_sort(int *vet, int n){
-    int comp = 0; int trocas = 0; 
+    //int comp = 0; int trocas = 0; 
     for (int i = 0; i < n-1; i++){
         int min = i; 
         for (int j = i + 1; j < n; j++){
@@ -53,7 +53,7 @@ void selection_sort(int *vet, int n){
 }
 
 void insertion_sort(int *vet, int n){
-    int comp = 0; int trocas = 0; 
+    //int comp = 0; int trocas = 0; 
     int j; 
     for (int i = 1; i < n; i++){
         int x = vet[i]; 
@@ -73,7 +73,7 @@ void insertion_sort(int *vet, int n){
 }
 
 void shell_sort(int *vet, int inc[], int n, int n_inc){
-    int comp = 0; int trocas = 0; 
+    //int comp = 0; int trocas = 0; 
     int i, j; 
     int h; 
     for (int k = 0; k < n_inc; k++){ //vai iterar pelos elementos de inc
@@ -223,7 +223,7 @@ void merge_sort(int *vet, int inicio, int fim){
 }
 
 int *contagem_de_menores(int *vet, int n){
-    int comp = 0, trocas = 0; 
+    //int comp = 0, trocas = 0; 
     int *posicao = (int*)malloc(sizeof(int)*n); 
     //zerar o vetor posicao 
     for (int i = 0; i < n; i++){
@@ -271,13 +271,16 @@ int *counting_sort(int *vet, int tam, int pos){
         tipos[digito(vet[i], pos)]--;
     }
 
-    free(vet);
     return sorted;
 }
 
-int *radixsort(int *vet, int tam, int n_dig){
-    //int n_dig = numero_digitos(vet, tam); 
-    for(int i = 1; i <= n_dig; i++){
+int *radixsort(int *vet, int tam){
+    int ctrl=tam, maxdig=0;
+    while(ctrl!=0){
+    ctrl/=10;
+    maxdig++;
+    }
+    for(int i = 1; i <= maxdig; i++){
         vet = counting_sort(vet, tam, i);
     }
     // printf("Quantidade de comparações: 0\n"); 
@@ -292,93 +295,122 @@ void imprimir_vetor(int *vet, int n){
     printf("\n"); 
 }
 
-// int main(void){
-//     int n; 
+void testar(const char* algfilename);
 
-//     printf("Tamanho do vetor:\n"); 
-//     scanf("%d", &n); 
+int main(void){
+    testar("results/radix.csv");
+}
 
-//     int *vet = (int*) malloc(sizeof(int)*n);
-    // printf("Tamanho do vetor:\n"); 
-    // scanf("%d", &n); 
-    
-    // int *vet = (int*) malloc(sizeof(int)*n); 
-    // bubble_sort(vet, n);
-    // selection_sort(vet, n);
-    // insertion_sort(vet, n); 
-    // int inc[] = {5, 3, 1};
-    // shell_sort(vet, inc, n, 3); 
-    // quick_sort(vet, 0, n-1); 
-    // heap_sort(vet, n); 
-    // merge_sort(vet, 0, n-1); 
-    // contagem_de_menores(vet, n); 
-    // radixsort(vet, n, 6); //rever isso 
+void testar(const char* algfilename){
+    FILE* in = fopen("tests/tests.txt", "r");
+    FILE* out=fopen(algfilename, "w");
+    fprintf(out, "ordenação, n, tempo, comparações, trocas\n");
 
-//     clock_t ini, fim;
-//     ini=clock();
-//     bubble_sort(vet, n);
-//     selection_sort(vet, n);
-//     insertion_sort(vet, n); 
-//     int inc[] = {5, 3, 1};
-//     shell_sort(vet, inc, n, 3); 
-//     quick_sort(vet, 0, n-1); 
-//     heap_sort(vet, n); 
-//     merge_sort(vet, 0, n-1); 
-//     contagem_de_menores(vet, n); 
-//     radixsort(vet, n, n_dig); //rever isso
-//     fim=clock();
-
-//     imprimir_vetor(vet, n); 
-    
-//     double tempo=(double)(fim-ini)/CLOCKS_PER_SEC;
-//     FILE* f=fopen("results.csv", "r+");
-//     fprintf(f, "%lf\n", tempo)
-
-// }
-
-int main(int argc, char* argv[]){
-    FILE* in = fopen(argv[1], "r");
-        printf("opened the files file\n");
-    FILE* out=fopen("results.csv", "r+");
-        printf("opened results\n");
-    fseek(out, 0, SEEK_END);
-    /*Mudar para cada teste */fprintf(out, "bubble sort, ");
-
-    for(int i=0; i<QTD_TEST; i++){
-        char* filename = (char*)malloc(35);
+    for(int i=0; i<QTD_TESTS; i++){
+        char* filename = (char*)malloc(50);
         fscanf(in, " %s", filename); //le qual vai ser o arquivo teste
-            printf("FILE = %s\n", filename);
         FILE* input=fopen(filename, "r"); //abre o arquivo da vez
         int n;
         fscanf(input, "%d", &n);
-            printf("n = %d\n", n);
         int *vet = (int*) malloc(sizeof(int)*n);
         for(int i=0; i<n; i++){
             fscanf(input, "%d", &vet[i]);
         }
         fclose(input);
-        //imprimir_vetor(vet, n);
+        comp=0; trocas=0;
+    
         clock_t ini, fim;
             ini=clock();
-        bubble_sort(vet, n);
-        // selection_sort(vet, n);
-        // insertion_sort(vet, n);
-        // int inc[] = {5, 3, 1};
-        // shell_sort(vet, inc, n, 3); 
-        // quick_sort(vet, 0, n-1); 
-        // heap_sort(vet, n); 
-        // merge_sort(vet, 0, n-1); 
-        // contagem_de_menores(vet, n); 
-        // radixsort(vet, n, n_dig); //rever isso
+        //bubble_sort(vet, n);
+        //selection_sort(vet, n);
+        //insertion_sort(vet, n);
+            //int inc[] = {5, 3, 1};
+        //shell_sort(vet, inc, n, 3); 
+        //quick_sort(vet, 0, n-1); 
+        //heap_sort(vet, n); 
+        //merge_sort(vet, 0, n-1); 
+        //contagem_de_menores(vet, n);
+        radixsort(vet, n); //rever isso
             fim=clock();
         free(vet);
 
         double tempo=(double)(fim-ini)/CLOCKS_PER_SEC;
-        fprintf(out, "%lf, ", tempo);
-        printf("%d: bubble sort took %lf s for %d elements\n\n", i, tempo, n);
+        char* ordem=strtok(filename+6, "/");
+
+        int tracker;
+        if(i>7){
+            double vet_tempos[5];
+            long int vet_comp[5], vet_trocas[5];
+            if(i==8||i==13||i==18||i==23){
+                tracker=i;
+            }
+            vet_tempos[(i-tracker)]=tempo;
+            vet_comp[(i-tracker)]=comp;
+            vet_trocas[(i-tracker)]=trocas;
+            if((i-tracker)!=4)
+                continue;
+            for(int j=0; j<4; j++){
+                tempo+=vet_tempos[j];
+                comp+=vet_comp[j];
+                trocas+=vet_trocas[j];
+            }
+            tempo/=5;
+            comp/=5;
+            trocas/=5;
+        }
+
+        fprintf(out, "%s, %d, %lf, %lld, %lld\n", ordem, n, tempo, comp, trocas);
+        printf("%s took %lf s for %d %s elements\n\n", algfilename+8, tempo, n, filename+6);
     }
-    fprintf(out, "\n");
+    //fprintf(out, "\n");
 
     fclose(in);
     fclose(out);
 }
+
+// int main1(void){
+//     FILE* in = fopen("tests.txt", "r");
+//         printf("opened the files file\n");
+//     FILE* out=fopen("results.csv", "r+");
+//         printf("opened results\n");
+//     fseek(out, 0, SEEK_END);
+//     /*Mudar para cada teste */fprintf(out, "bubble sort, ");
+
+//     for(int i=0; i<QTD_TESTS; i++){
+//         char* filename = (char*)malloc(35);
+//         fscanf(in, " %s", filename); //le qual vai ser o arquivo teste
+//             printf("FILE = %s\n", filename);
+//         FILE* input=fopen(filename, "r"); //abre o arquivo da vez
+//         int n;
+//         fscanf(input, "%d", &n);
+//             printf("n = %d\n", n);
+//         int *vet = (int*) malloc(sizeof(int)*n);
+//         for(int i=0; i<n; i++){
+//             fscanf(input, "%d", &vet[i]);
+//         }
+//         fclose(input);
+//         //imprimir_vetor(vet, n);
+//         clock_t ini, fim;
+//             ini=clock();
+//         bubble_sort(vet, n);
+//         // selection_sort(vet, n);
+//         // insertion_sort(vet, n);
+//         // int inc[] = {5, 3, 1};
+//         // shell_sort(vet, inc, n, 3); 
+//         // quick_sort(vet, 0, n-1); 
+//         // heap_sort(vet, n); 
+//         // merge_sort(vet, 0, n-1); 
+//         // contagem_de_menores(vet, n); 
+//         // radixsort(vet, n, n_dig); //rever isso
+//             fim=clock();
+//         free(vet);
+
+//         double tempo=(double)(fim-ini)/CLOCKS_PER_SEC;
+//         fprintf(out, "%lf, ", tempo);
+//         printf("%d: bubble sort took %lf s for %d elements\n\n", i, tempo, n);
+//     }
+//     fprintf(out, "\n");
+
+//     fclose(in);
+//     fclose(out);
+// }

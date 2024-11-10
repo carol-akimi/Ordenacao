@@ -1,0 +1,13 @@
+ordenação, n, tempo, comparações, trocas
+sorted, 100, 0.000011, 0, 0
+sorted, 1000, 0.000101, 0, 0
+sorted, 10000, 0.001723, 0, 0
+sorted, 100000, 0.015959, 0, 0
+reverse_sorted, 100, 0.000005, 0, 0
+reverse_sorted, 1000, 0.000049, 0, 0
+reverse_sorted, 10000, 0.000770, 0, 0
+reverse_sorted, 100000, 0.011013, 0, 0
+random, 100, 0.000005, 0, 0
+random, 1000, 0.000049, 0, 0
+random, 10000, 0.000786, 0, 0
+random, 100000, 0.010377, 0, 0
