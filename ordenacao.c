@@ -4,29 +4,34 @@
 #include <limits.h>
 
 void bubble_sort(int *vet, int n){
-    int troca = 1; 
-    for (int i = 0; i < n; i++){
-        int troca = 0; 
-        for (int j = 0; j < n - 1; j++){
-            if (vet[j] > vet[j + 1]){
+    int troca = 1; //conta a quantidade de trocas feitas 
+    for (int i = 0; i < n - 1; i++){
+        troca = 0; 
+        for (int j = 0; j < n-i-1; j++){
+            //compara de dois em dois elementos, troca se 
+            //o seu sucessor está na ordem incorreta 
+            if (vet[j] > vet[j + 1]){ 
                 int aux = vet[j]; 
                 vet[j] = vet[j + 1]; 
                 vet[j + 1] = aux; 
                 troca = 1;
             }
         }
-        if(troca == 0)
+        //se não ocorreu nenhuma troca, o vetor está ordenado, encerra o laço
+        if(troca == 0) 
             break; 
     }
 }
 
 void selection_sort(int *vet, int n){
     for (int i = 0; i < n-1; i++){
-        int min = i; 
+        int min = i; //armazena a posição do menor elemento
         for (int j = i + 1; j < n; j++){
+            //busca se existe um elemento menor que o armazenado atualemente
             if (vet[j] < vet[min])
                 min = j; 
         }
+        //se um menor elemento é encontrado, há uma troca com o item de posição i   
         if(i != min){
             int aux = vet[i];
             vet[i] = vet[min];
@@ -38,10 +43,14 @@ void selection_sort(int *vet, int n){
 void insertion_sort(int *vet, int n){
     int j; 
     for (int i = 1; i < n; i++){
-        int x = vet[i]; 
+        //armazena o valor atual para que não seja perdido após as movimentações
+        int x = vet[i];
+        //os elementos maiores que x são movidos uma posição para frente
         for (j = i - 1; j >= 0 && vet[j] > x; j--){
             vet[j+1] = vet[j]; 
         }
+        //insere o elemento na posição correta, os elementos  
+        //a esquerda dessa posição já estão ordenados 
         vet[j+1] = x; 
     }
 }
@@ -49,9 +58,11 @@ void insertion_sort(int *vet, int n){
 void shell_sort(int *vet, int inc[], int n, int n_inc){
     int i, j; 
     int h; 
-    for (int incre = 0; incre < n_inc; incre++){ //vai iterar pelos elementos de inc
-        h = inc[incre]; 
-        //inserção simples 
+    //itera pelos elementos de inc, que armazena as distâncias dos sub-conjuntos
+    for (int k = 0; k < n_inc; k++){ 
+        h = inc[k]; 
+        //realiza uma inserção simples, mas os elementos estão 
+        //separados por uma distância h 
         for (i = h; i < n; i++){
             int x = vet[i]; 
             for (j = i - h; j >= 0 && vet[j] > x; j -= h){
@@ -63,7 +74,8 @@ void shell_sort(int *vet, int inc[], int n, int n_inc){
 
 }
 
-int mediana(int a, int b, int c, int *vet){
+//Função devove a mediana dados três elementos
+int mediana(int a, int b, int c){
     if((a >= b && a <= c)||(a <= b && a >= c))
         return a;
     else if((b>=a && b<=c)||(b<=a && b >= c))
@@ -75,25 +87,29 @@ int mediana(int a, int b, int c, int *vet){
 void quick_sort(int *vet, int inicio, int fim){
     int i = inicio; 
     int j = fim; 
-    int pivo = mediana(vet[inicio], vet[(inicio+fim)/2], vet[fim], vet); 
+    //o pivo é a mediana entre o elemento do inicio, meio e fim
+    int pivo = mediana(vet[inicio], vet[(inicio+fim)/2], vet[fim]); 
     do{
+        //organiza os elementos de forma que todos a esquerda
+        //sejam menores e os da direita, maiores
         while (vet[i] < pivo) i++; 
         while (vet[j] > pivo) j--;  
         if (i <= j){
+            //troca os elementos se o da direita é menor que um no lado esquerdo
             int aux = vet[i]; 
             vet[i] = vet[j]; 
             vet[j] = aux; 
             i++; 
             j--; 
         }
+    //para a iteração quando i e j se "cruzam"
+    //chama recursivamente a função para cada metade do vetor
     }while (i < j); 
     if (j > inicio)
         quick_sort(vet, inicio, j); 
     if (i < fim)
         quick_sort(vet, i, fim);
-
 }
-
 
 void rearranjar_heap(int *heap, int tam_heap, int i){
     int esq, dir, maior; 
