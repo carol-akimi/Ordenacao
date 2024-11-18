@@ -9,7 +9,7 @@ void bubble_sort(int *vet, int n){
     int comp = 0; int trocas = 0; 
     for (int i = 0; i < n; i++){
         int troca = 0; 
-        for (int j = 0; j < n - 1; j++){
+        for (int j = 0; j < n - i - 1; j++){
             comp++;
             if (vet[j] > vet[j + 1]){
                 int aux = vet[j]; 
@@ -363,7 +363,7 @@ int main(int argc, char* argv[]){
         free(vet);
 
         double tempo=(double)(fim-ini)/CLOCKS_PER_SEC;
-        fprintf(out, "%lf, ", tempo)
+        fprintf(out, "%lf, ", tempo);
         printf("%d: BUBBLE SORT TOOK %lf s for %d elements\n", i, tempo, n);
     }
     fprintf(out, "\n");
