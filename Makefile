@@ -1,5 +1,8 @@
 all:
-	gcc rascunho.c -Wall -std=c99 -o ras 
+	gcc ordenacao.c -Wall -std=c99 -o ord 
 
 run:
-	./ras < in.1 
+	./ord < in.1 
+
+clean:
+	rm ord

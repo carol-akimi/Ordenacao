@@ -117,7 +117,7 @@ void quick_sort(int *vet, int inicio, int fim, int *comp, int *trocas){
             (*comp)++; 
         }
         (*comp)++; //quando a condição falha 
-        if (i <= j){ //conto essa comparação?
+        if (i <= j){ 
             int aux = vet[i]; 
             vet[i] = vet[j]; 
             vet[j] = aux; 
@@ -199,11 +199,9 @@ void intercala(int *vet, int inicio, int meio, int fim, int *comp, int *trocas){
         if (L[i] <= R[j]){
             vet[k] = L[i]; 
             i++; 
-            (*trocas)++;  //receber é troca?
         }else{
             vet[k] = R[j]; 
             j++; 
-            (*trocas)++; 
         }
     }
 }

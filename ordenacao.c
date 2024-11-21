@@ -30,7 +30,7 @@ void selection_sort(int *vet, int n){
             //busca se existe um elemento menor que o armazenado atualemente
             if (vet[j] < vet[min])
                 min = j; 
-        }
+        }   
         //se um menor elemento é encontrado, há uma troca com o item de posição i   
         if(i != min){
             int aux = vet[i];
@@ -162,18 +162,6 @@ void heap_sort(int *vet, int n){
     }
 }
 
-void merge_sort(int *vet, int inicio, int fim){
-    //divide o vetor ao meio até que não seja mais possível e chama a função 
-    //recursiva para cada metade do vetor, após as divisões a função intercala 
-    //faz a junçã de forma ordenada 
-    if (inicio < fim){
-        int meio = (inicio+fim)/2; 
-        merge_sort(vet, inicio, meio);
-        merge_sort(vet, meio+1, fim); 
-        intercala(vet, inicio, meio, fim); 
-    }
-}
-
 //Função que faz a junção de dois subvetores, de forma que eles fiquem ordenados 
 void intercala(int *vet, int inicio, int meio, int fim){
     int i, j, k;
@@ -210,6 +198,19 @@ void intercala(int *vet, int inicio, int meio, int fim){
     }
 }
 
+void merge_sort(int *vet, int inicio, int fim){
+    //divide o vetor ao meio até que não seja mais possível e chama a função 
+    //recursiva para cada metade do vetor, após as divisões a função intercala 
+    //faz a junçã de forma ordenada 
+    if (inicio < fim){
+        int meio = (inicio+fim)/2; 
+        merge_sort(vet, inicio, meio);
+        merge_sort(vet, meio+1, fim); 
+        intercala(vet, inicio, meio, fim); 
+    }
+}
+
+
 int *contagem_de_menores(int *vet, int n){
     //armazena quantos elementos são menores que o elemento daquela posição
     int *posicao = (int*)malloc(sizeof(int)*n); 
@@ -238,14 +239,12 @@ int *contagem_de_menores(int *vet, int n){
     return sorted; 
 }
 
-int *radixsort(int *vet, int tam, int n_dig){
-    //n_dig armazena a quantidade máxima de dígitos que cada número possui
-    //loop que itera por todos os dígitos do número, os ordenado os ordenando
-    //do mais ao menos significativo utilizando o algoritmo counting sort 
-    for(int i = 1; i <= n_dig; i++){
-        vet = counting_sort(vet, tam, i);
-    }
-    return vet; 
+//Função que devolve qual digito está na posição pos 
+int digito(int num, int pos){
+    for(int i=0; i<(pos-1); i++)
+        num /= 10;
+
+    return num % 10;
 }
 
 int *counting_sort(int *vet, int tam, int pos){
@@ -275,14 +274,18 @@ int *counting_sort(int *vet, int tam, int pos){
     return sorted;
 }
 
-//Função que devolve qual digito está na posição pos 
-int digito(int num, int pos){
-    for(int i=0; i<(pos-1); i++)
-        num /= 10;
 
-    return num % 10;
+int *radixsort(int *vet, int tam, int n_dig){
+    //n_dig armazena a quantidade máxima de dígitos que cada número possui
+    //loop que itera por todos os dígitos do número, os ordenado os ordenando
+    //do mais ao menos significativo utilizando o algoritmo counting sort 
+    for(int i = 1; i <= n_dig; i++){
+        vet = counting_sort(vet, tam, i);
+    }
+    return vet; 
 }
 
+//Função que imprime os elementos de um vetor 
 void imprimir_vetor(int *vet, int n){
     for (int i = 0; i < n; i++){
         printf("%d ", vet[i]); 
@@ -291,22 +294,25 @@ void imprimir_vetor(int *vet, int n){
 }
 
 int main(void){
+    //Leitura dos dados 
     int n; 
-
-    printf("Tamanho do vetor:\n"); 
     scanf("%d", &n); 
-
     int *vet = (int*) malloc(sizeof(int)*n); 
-    bubble_sort(vet, n);
-    selection_sort(vet, n);
-    insertion_sort(vet, n); 
-    int inc[3] = {5, 3, 1}; 
-    shell_sort(vet, inc, n, 3); 
-    quick_sort(vet, 0, n-1); 
-    heap_sort(vet, n); 
-    merge_sort(vet, 0, n-1); 
-    contagem_de_menores(vet, n); 
-    radixsort(vet, n, 6); 
+    for (int i = 0; i < n; i++){
+        scanf("%d", &vet[i]); 
+    }
+
+    //Ordenação 
+    //bubble_sort(vet, n);
+    //selection_sort(vet, n);
+    //insertion_sort(vet, n); 
+    //int inc[3] = {5, 3, 1}; 
+    //shell_sort(vet, inc, n, 3); 
+    //quick_sort(vet, 0, n-1); 
+    //heap_sort(vet, n); 
+    //merge_sort(vet, 0, n-1); 
+    //vet = contagem_de_menores(vet, n); 
+    //vet = radixsort(vet, n, 6); 
 
     imprimir_vetor(vet, n); 
     

@@ -3,46 +3,27 @@
 #include <string.h>
 #include <limits.h>
 
-int *counting_sort(int *vet, int tam, int pos);
-int digito(int num, int pos);
-int numero_digitos(int* vet, int tam);
-
-int *radixsort(int *vet, int tam, int n_dig){
-    //int n_dig = numero_digitos(vet, tam); 
-    for(int i = 1; i <= n_dig; i++){
-        vet = counting_sort(vet, tam, i);
+void bubble_sort(int *vet, int n){
+    int comp = 0; int trocas = 0; 
+    for (int i = 0; i < n; i++){
+        int troca = 0; 
+        for (int j = 0; j < n - i - 1; j++){
+            comp++;
+            if (vet[j] > vet[j + 1]){
+                int aux = vet[j]; 
+                vet[j] = vet[j + 1]; 
+                vet[j + 1] = aux; 
+                troca = 1;
+                trocas++; 
+            }
+        }
+        if(troca == 0){
+            break; 
+        }
     }
-    printf("Quantidade de comparações: 0\n"); 
-    printf("Quantidade de movimentações: 0\n"); 
-    return vet; 
+    printf("Quantidade de comparações: %d\n", comp); 
+    printf("Quantidade de movimentações: %d\n", trocas); 
 }
-
-int *counting_sort(int *vet, int tam, int pos){
-    int tipos[10] = {0};
-    for(int i = 0; i < tam; i++){
-        tipos[digito(vet[i], pos)]++;
-    }
-    for(int i = 1; i < 10; i++)
-        tipos[i] += tipos[i-1];
-
-    int* sorted = malloc(tam * sizeof(int));
-
-    for(int i = tam-1; i >= 0; i--){
-        sorted[tipos[digito(vet[i], pos)]-1] = vet[i];
-        tipos[digito(vet[i], pos)]--;
-    }
-
-    free(vet);
-    return sorted;
-}
-
-int digito(int num, int pos){
-    for(int i=0; i<(pos-1); i++)
-        num /= 10;
-
-    return num % 10;
-}
-
 
 
 void imprimir_vetor(int *vet, int n){
@@ -59,9 +40,8 @@ int main(void){
     for (int i = 0; i < n; i++){
         scanf("%d", &vet[i]); 
     }
-    int *sorted; 
-    sorted = radixsort(vet, n, 2); 
-    imprimir_vetor(sorted, n); 
+    bubble_sort(vet, n); 
+    imprimir_vetor(vet, n); 
 
 
 }
