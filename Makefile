@@ -1,5 +1,5 @@
 all:
-	gcc -c main.c -o main -std=c99 -Wall
+	gcc main.c -o main -std=c99 -Wall
 
 run: mkresults
 	./main
