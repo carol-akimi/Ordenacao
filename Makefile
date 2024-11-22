@@ -1,8 +1,11 @@
 all:
-	gcc ordenacao.c -Wall -std=c99 -o ord 
+	gcc -c main.c -o main -std=c99 -Wall
 
-run:
-	./ord < in.1 
+run: mkresults
+	./main
+
+mkresults:
+	@mkdir result2
 
 clean:
-	rm ord
+	rm main

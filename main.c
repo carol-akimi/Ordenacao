@@ -1,13 +1,138 @@
-#include <stdio.h> 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <limits.h>
 #define QTD_TESTS 28
+#define QTD_SORTS 9
 
+/* Estrutura para auxiliar a coleta dos dados */
 typedef struct dados_{
     long long int comp, trocas;
-}Dados;
+} Dados;
+
+/* Algoritmos de Ordenação */
+void bubble_sort(int *vet, int n, Dados* bubble_data);
+void selection_sort(int *vet, int n, Dados* selection_data);
+void insertion_sort(int *vet, int n, Dados* insertion_data);
+void shell_sort(int *vet, int inc[], int n, int n_inc, Dados* shell_data);
+void quick_sort(int *vet, int inicio, int fim, Dados* quick_data);
+void heap_sort(int *vet, int n, Dados* heap_data);
+void merge_sort(int *vet, int inicio, int fim, Dados* merge_data);
+int* contagem_de_menores(int *vet, int n, Dados* counting_data);
+int* radix_sort(int *vet, int tam, Dados* radix_data);
+
+/* Definição de ponteiro para uma função de ordenação generalizada */
+typedef void AlgOrdenacao(int*, int, Dados*);
+
+/* Funções "envelope" para as chamadas aos algoritmos que 
+    levam parâmetros diferentes */
+void shell_wrapper(int *vet, int n, Dados* shell_data){
+    shell_sort(vet, (int[]){5, 3, 1}, n, 3, shell_data);
+}
+void quick_wrapper(int *vet, int n, Dados* quick_data){
+    quick_sort(vet, 0, n-1, quick_data);
+}
+void merge_wrapper(int *vet, int n, Dados* merge_data){
+    merge_sort(vet, 0, n-1, merge_data);
+}
+void counting_wrapper(int *vet, int n, Dados* counting_data){
+    contagem_de_menores(vet, n, counting_data);
+}
+void radix_wrapper(int *vet, int n, Dados* radix_data){
+    radix_sort(vet, n, radix_data);
+}
+
+
+void RodarTestes(AlgOrdenacao** algortitmos);
+
+int main(void){
+
+    /* Vetor de ponteiros para as funções de ordenação */
+    AlgOrdenacao* algoritmos[QTD_SORTS] = {
+        bubble_sort, selection_sort,
+        insertion_sort, shell_wrapper,
+        quick_wrapper, heap_sort,
+        merge_wrapper, counting_wrapper,
+        radix_wrapper
+    };
+
+    RodarTestes(algoritmos);
+}
+
+void RodarTestes(AlgOrdenacao** algoritmos){
+    const char* alg_nomes[QTD_SORTS] = {
+        "bubble", "selection", "insertion",
+        "shell", "quick", "heap",
+        "merge", "counting", "radix"
+    };
+    FILE* in = fopen("tests/tests.txt", "r");
+
+    for(int i = 0; i < QTD_SORTS; i++){
+        char outfilename[25];
+        sprintf(outfilename, "result2/%s.csv", alg_nomes[i]);
+        FILE* out = fopen(outfilename, "w");
+        fprintf(out, "ordenação, n, tempo, comparações, trocas\n");
+
+        for(int j = 0; j < QTD_TESTS; j++){
+            char* testfilename = (char*) malloc(50);
+            fscanf(in, " %s", testfilename); //le qual vai ser o arquivo teste
+            FILE* input = fopen(testfilename, "r"); //abre o arquivo da vez
+
+            int n;
+            fscanf(input, "%d", &n);
+
+            int *vet = (int*) malloc(n*sizeof(int));
+            for(int i = 0; i < n; i++){
+                fscanf(input, "%d", &vet[i]);
+            }
+            fclose(input);
+
+            Dados dados_coletados = {0, 0};
+
+            printf("Rodando %s sort... Teste %d/%d: %s\n", alg_nomes[i], j+1, QTD_TESTS, testfilename + 6);
+        
+            clock_t ini, fim;
+            ini=clock();
+            algoritmos[i](vet, n, &dados_coletados);
+            fim=clock();
+            free(vet);
+
+            double tempo = (double)(fim - ini) / CLOCKS_PER_SEC;
+            char* ordem = strtok(testfilename + 6, "/");
+
+            if(j > 7){
+                int tracker;
+                double vet_tempos[5];
+                long long int vet_comp[5], vet_trocas[5];
+                if(j == 8 || j == 13 || j == 18 || j == 23){
+                    tracker = j;
+                }
+                vet_tempos[(j-tracker)] = tempo;
+                vet_comp[(j-tracker)] = dados_coletados.comp;
+                vet_trocas[(j-tracker)] = dados_coletados.trocas;
+                if((j - tracker) != 4)
+                    continue;
+                for(int k = 0; k < 4; k++){
+                    tempo += vet_tempos[k];
+                    dados_coletados.comp += vet_comp[k];
+                    dados_coletados.trocas += vet_trocas[k];
+                }
+                tempo /= 5;
+                dados_coletados.comp /= 5;
+                dados_coletados.trocas /= 5;
+            }
+
+            fprintf(out, "%s, %d, %lf, %lld, %lld\n", ordem, n, tempo, dados_coletados.comp, dados_coletados.trocas);
+            printf("Tempo do %s sort foi %lf s para %d elementos com distribuição '%s'\n\n", alg_nomes[i], tempo, n, ordem);
+
+            free(testfilename);
+        }
+        fclose(out);
+        rewind(in);
+    }
+    fclose(in);
+}
 
 void bubble_sort(int *vet, int n, Dados* bubble_data){
     for (int i = 0; i < n; i++){
@@ -83,11 +208,7 @@ void shell_sort(int *vet, int inc[], int n, int n_inc, Dados* shell_data){
     }
 }
 
-void shell_wrapper(int *vet, int n, Dados* shell_data){
-    shell_sort(vet, (int[]){5, 3, 1}, n, 3, shell_data);
-}
-
-int mediana(int a, int b, int c, int *vet){
+int mediana(int a, int b, int c){
     if((a >= b && a <= c)||(a <= b && a >= c))
         return a;
     else if((b>=a && b<=c)||(b<=a && b >= c))
@@ -99,7 +220,7 @@ int mediana(int a, int b, int c, int *vet){
 void quick_sort(int *vet, int inicio, int fim, Dados* quick_data){
     int i = inicio; 
     int j = fim; 
-    int pivo = mediana(vet[inicio], vet[(inicio+fim)/2], vet[fim], vet); 
+    int pivo = mediana(vet[inicio], vet[(inicio+fim)/2], vet[fim]); 
     do{
         while (vet[i] < pivo){
             i++; 
@@ -124,10 +245,6 @@ void quick_sort(int *vet, int inicio, int fim, Dados* quick_data){
             quick_sort(vet, inicio, j, quick_data); 
         if (i < fim)
             quick_sort(vet, i, fim, quick_data);
-}
-
-void quick_wrapper(int *vet, int n, Dados* quick_data){
-    return quick_sort(vet, 0, n-1, quick_data);
 }
 
 void rearranjar_heap(int *heap, int tam_heap, int i, Dados* heap_data){
@@ -215,10 +332,6 @@ void merge_sort(int *vet, int inicio, int fim, Dados* merge_data){
     }
 }
 
-void merge_wrapper(int *vet, int n, Dados* merge_data){
-    return merge_sort(vet, 0, n-1, merge_data);
-}
-
 int* contagem_de_menores(int *vet, int n, Dados* counting_data){
     int *posicao = (int*)calloc(n, sizeof(int));
 
@@ -238,10 +351,6 @@ int* contagem_de_menores(int *vet, int n, Dados* counting_data){
         sorted[posicao[i]] = vet[i];
 
     return sorted;    
-}
-
-void contagem_wrapper(int *vet, int n, Dados* counting_data){
-    contagem_de_menores(vet, n, counting_data);
 }
 
 int digito(int num, int pos){
@@ -269,7 +378,7 @@ int* counting_sort(int *vet, int tam, int pos){
     return sorted;
 }
 
-int* radixsort(int *vet, int tam){
+int* radix_sort(int *vet, int tam, Dados* radix_data){
     int ctrl=tam, maxdig=0;
     while(ctrl!=0){
     ctrl/=10;
@@ -280,79 +389,4 @@ int* radixsort(int *vet, int tam){
         vet = counting_sort(vet, tam, i);
 
     return vet; 
-}
-
-void radix_wrapper(int *vet, int n, Dados* radix_data){
-    radixsort(vet, n);
-}
-
-
-void testar(const char* algfilename){
-    FILE* in = fopen("tests/tests.txt", "r");
-    FILE* out=fopen(algfilename, "w");
-    fprintf(out, "ordenação, n, tempo, comparações, trocas\n");
-
-    for(int i=0; i<QTD_TESTS; i++){
-        char* filename = (char*)malloc(50);
-        fscanf(in, " %s", filename); //le qual vai ser o arquivo teste
-        FILE* input=fopen(filename, "r"); //abre o arquivo da vez
-        int n;
-        fscanf(input, "%d", &n);
-        int *vet = (int*) malloc(sizeof(int)*n);
-        for(int i=0; i<n; i++){
-            fscanf(input, "%d", &vet[i]);
-        }
-        fclose(input);
-        Dados dados_coletados = {0, 0};
-    
-        clock_t ini, fim;
-            ini=clock();
-        //dados_coletados = bubble_sort(vet, n);
-        //dados_coletados = selection_sort(vet, n);
-        //dados_coletados = insertion_sort(vet, n);
-            //int inc[] = {5, 3, 1};
-        //dados_coletados = shell_sort(vet, inc, n, 3); 
-        //quick_sort(vet, 0, n-1, &dados_coletados); 
-        //heap_sort(vet, n, &dados_coletados); 
-        //merge_sort(vet, 0, n-1, &dados_coletados); 
-        //dados_coletados = contagem_de_menores(vet, n);
-        //dados_coletados = radixsort(vet, n);
-            fim=clock();
-        free(vet);
-
-        double tempo=(double)(fim-ini)/CLOCKS_PER_SEC;
-        char* ordem=strtok(filename+6, "/");
-
-        int tracker;
-        if(i>7){
-            double vet_tempos[5];
-            long long unsigned int vet_comp[5], vet_trocas[5];
-            if(i==8||i==13||i==18||i==23){
-                tracker=i;
-            }
-            vet_tempos[(i-tracker)] = tempo;
-            vet_comp[(i-tracker)] = dados_coletados.comp;
-            vet_trocas[(i-tracker)] = dados_coletados.trocas;
-            if((i-tracker)!=4)
-                continue;
-            for(int j=0; j<4; j++){
-                tempo+=vet_tempos[j];
-                dados_coletados.comp+=vet_comp[j];
-                dados_coletados.trocas+=vet_trocas[j];
-            }
-            tempo/=5;
-            dados_coletados.comp/=5;
-            dados_coletados.trocas/=5;
-        }
-
-        fprintf(out, "%s, %d, %lf, %lld, %lld\n", ordem, n, tempo, dados_coletados.comp, dados_coletados.trocas);
-        printf("%s took %lf s for %d %s elements\n\n", algfilename+8, tempo, n, filename+6);
-    }
-
-    fclose(in);
-    fclose(out);
-}
-
-int main(void){
-    testar("results/radix.csv");
 }
