@@ -1,0 +1,6 @@
+Para compilar e executar:
+    make all
+    make run
+
+Para apagar o executável:
+    make clean
